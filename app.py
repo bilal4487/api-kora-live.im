@@ -46,46 +46,46 @@ def extract_match_data(html_content: str) -> List[Match]:
     """Parses the HTML content to extract match data."""
     soup = BeautifulSoup(html_content, 'html.parser')
     matches_list = []
-    match_containers = soup.find_all('div', class_='match-row') # Assuming 'match-row' or similar is the container for each match
+    match_containers = soup.find_all('div', class_='match-item') # Based on visual inspection, 'match-item' is a common class for these cards
 
     # Fallback/Alternative selector if 'match-item' is not correct
     if not match_containers:
         # Try to find the main table or list of matches
-        match_containers = soup.select('.match-row, .match-item') # Example selectors: trying common names
+        match_containers = soup.select('.match-item') # Use the most likely class name
 
     for i, container in enumerate(match_containers):
         try:
             # --- Extracting Data (Highly dependent on actual HTML structure) ---
             
             # Team Names
-            n1_element = container.select_one('.team-name.right') # Assuming right side is team 1 (n1) in the structure
-            n2_element = container.select_one('.team-name.left') # Assuming left side is team 2 (n2) in the structure
+            n1_element = container.select_one('.team-name.right') # Assuming this structure is still valid for team name
+            n2_element = container.select_one('.team-name.left') # Assuming this structure is still valid for team name
             n1 = n1_element.text.strip() if n1_element else "فريق غير معروف"
             n2 = n2_element.text.strip() if n2_element else "فريق غير معروف"
             
             # Logos (Assuming logos are within an img tag with a specific class)
-            img1_element = container.select_one('.team-logo.right img') # Assuming right side is team 1 logo
-            img2_element = container.select_one('.team-logo.left img') # Assuming left side is team 2 logo
+            img1_element = container.select_one('.team-logo.right img') # Assuming this structure is still valid for logo
+            img2_element = container.select_one('.team-logo.left img') # Assuming this structure is still valid for logo
             imag1 = img1_element['src'] if img1_element and img1_element.has_attr('src') else "N/A"
             imag2 = img2_element['src'] if img2_element and img2_element.has_attr('src') else "N/A"
             
             # Time/Score and Status
-            time_status_container = container.select_one('.match-time-status') # Correcting assumed class name
+            time_status_container = container.select_one('.match-time-status') # Keeping the assumption for now, but will check inner elements
             time_score = "N/A"
             status = "N/A"
             if time_status_container:
-                time_score_element = time_status_container.select_one('.time, .score') # Time or Score
-                status_element = time_status_container.select_one('.status') # Status
+                time_score_element = time_status_container.select_one('.time, .score') # Keeping the assumption for now
+                status_element = time_status_container.select_one('.status') # Keeping the assumption for now
                 time_score = time_score_element.text.strip() if time_score_element else "N/A"
                 status = status_element.text.strip() if status_element else "N/A"
             
             # League/Country and Channel
-            details_container = container.select_one('.match-details') # Correcting assumed class name
+            details_container = container.select_one('.match-details') # Keeping the assumption for now
             daw = "N/A"
             anat = "N/A"
             if details_container:
-                daw_element = details_container.select_one('.league, .tournament') # League or Tournament
-                anat_element = details_container.select_one('.channel, .commentator') # Channel or Commentator
+                daw_element = details_container.select_one('.league, .tournament') # Keeping the assumption for now
+                anat_element = details_container.select_one('.channel, .commentator') # Keeping the assumption for now
                 daw = daw_element.text.strip() if daw_element else "N/A"
                 anat = anat_element.text.strip() if anat_element else "N/A"
 
@@ -93,7 +93,7 @@ def extract_match_data(html_content: str) -> List[Match]:
             ma = "PM" # Defaulting to PM as per user example
 
             # Match Link (for m3u8 extraction later)
-            match_link_element = container.find('a', href=re.compile(r'/match/')) # Finding the main link to the match page
+            match_link_element = container.find('a', href=re.compile(r'/match/')) # Keeping the assumption for now
             match_url = match_link_element['href'] if match_link_element else None
             
             # Prepend base URL if the link is relative
